@@ -1,0 +1,12 @@
+# Fail on critical or high severity vulnerabilities
+name: Security Policy
+rules:
+  - name: block-critical-vulnerabilities
+    filter: |
+      vulns.critical.exists(v, true)
+    action: fail
+
+  - name: block-high-vulnerabilities
+    filter: |
+      vulns.high.exists(v, true)
+    action: fail

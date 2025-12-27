@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+echo "Running trufflehog secret scan..."
+
+# Check if trufflehog is installed
+if ! command -v trufflehog &> /dev/null; then
+    echo "ERROR: trufflehog is not installed."
+    echo "Install with: brew install trufflehog"
+    exit 1
+fi
+
+# Run trufflehog on the repository
+# --only-verified only reports verified secrets (reduces false positives)
+# --fail exits with non-zero if secrets are found
+trufflehog filesystem . --only-verified --fail
+
+echo "No secrets found."

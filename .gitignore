@@ -1,0 +1,22 @@
+# Build artifacts
+.build/
+*.xcodeproj
+xcuserdata/
+DerivedData/
+
+# Swift Package Manager
+.swiftpm/
+Package.resolved
+
+# macOS
+.DS_Store
+*.dSYM
+
+# IDE
+.idea/
+*.swp
+*.swo
+*.vscode/
+
+# Release artifacts (generated)
+*.zip

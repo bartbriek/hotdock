@@ -1,0 +1,68 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Swift
+        uses: swift-actions/setup-swift@v3
+        with:
+          swift-version: '6.0'
+
+      - name: Install semantic-release
+        run: npm install -g semantic-release @semantic-release/exec
+
+      - name: Get next version
+        id: version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get next version from semantic-release dry run
+          NEXT_VERSION=$(npx semantic-release --dry-run 2>&1 | grep -E "next release version is [0-9]+\.[0-9]+\.[0-9]+" | sed -E 's/.*next release version is ([0-9]+\.[0-9]+\.[0-9]+).*/\1/' || echo "")
+
+          if [ -z "$NEXT_VERSION" ]; then
+            echo "No new version to release"
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          else
+            echo "version=$NEXT_VERSION" >> $GITHUB_OUTPUT
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "Next version: $NEXT_VERSION"
+          fi
+
+      - name: Build DMG
+        if: steps.version.outputs.should_release == 'true'
+        run: ./scripts/build.sh ${{ steps.version.outputs.version }}
+
+      - name: Release
+        if: steps.version.outputs.should_release == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+
+      - name: Upload DMG to Release
+        if: steps.version.outputs.should_release == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          files: .build/Hotdock-${{ steps.version.outputs.version }}.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
