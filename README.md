@@ -2,6 +2,8 @@
 
 A lightweight macOS menu bar utility that lets you switch between dock applications using keyboard shortcuts.
 
+![Hotdock screenshot](image.png)
+
 ## Features
 
 - **Keyboard shortcuts**: Press `Ctrl + number` to toggle dock apps by position
