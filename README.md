@@ -23,13 +23,8 @@ xattr -cr /Applications/Hotdock.app
 
 Or right-click the app → "Open" → Click "Open" in the dialog.
 
-### Option 2: Homebrew (coming soon)
 
-```bash
-brew install --cask hotdock
-```
-
-### Option 3: Build from Source
+### Option 2: Build from Source
 
 ```bash
 git clone https://github.com/bartbriek/hotdock.git
@@ -80,20 +75,6 @@ Click the menu bar icon to:
 - macOS 12.0 (Monterey) or later
 - Accessibility permission
 
-## Development
-
-### Project Structure
-
-```
-Sources/
-  HotdockCore/       # Core library
-  Hotdock/           # Executable entry point
-Resources/
-  Info.plist         # App bundle metadata
-  AppIcon.icns       # App icon
-scripts/
-  build.sh           # Build DMG installer
-```
 
 ### Building
 
@@ -102,40 +83,6 @@ scripts/
 
 # Output: .build/Hotdock-1.0.0.dmg
 ```
-
-### Releases
-
-Releases are automated via GitHub Actions using [semantic-release](https://github.com/semantic-release/semantic-release).
-
-Use [Conventional Commits](https://www.conventionalcommits.org/) to trigger releases:
-
-| Commit prefix | Version bump | Example |
-|---------------|--------------|---------|
-| `fix:` | Patch (1.0.X) | `fix: resolve crash on startup` |
-| `feat:` | Minor (1.X.0) | `feat: add keyboard shortcut customization` |
-| `feat!:` or `BREAKING CHANGE:` | Major (X.0.0) | `feat!: change default modifier key` |
-
-Commits without these prefixes (e.g., `docs:`, `chore:`, `refactor:`) won't trigger a release.
-
-## Homebrew Distribution
-
-To distribute via Homebrew, create a cask formula:
-
-```ruby
-cask "hotdock" do
-  version "1.0.0"
-  sha256 "YOUR_SHA256_HERE"
-
-  url "https://github.com/bartbriek/hotdock/releases/download/v#{version}/Hotdock-#{version}.dmg"
-  name "Hotdock"
-  desc "Keyboard shortcuts for dock applications"
-  homepage "https://github.com/bartbriek/hotdock"
-
-  app "Hotdock.app"
-end
-```
-
-This can be submitted to [homebrew-cask](https://github.com/Homebrew/homebrew-cask) or hosted in your own tap.
 
 ## License
 
