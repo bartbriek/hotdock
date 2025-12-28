@@ -16,7 +16,7 @@ A lightweight macOS menu bar utility that lets you switch between dock applicati
 ### Option 1: Homebrew
 
 ```bash
-brew tap bartbriek/hotdock
+brew tap bartbriek/hotdock https://github.com/bartbriek/hotdock
 brew install --cask hotdock
 ```
 
