@@ -13,7 +13,14 @@ A lightweight macOS menu bar utility that lets you switch between dock applicati
 
 ## Installation
 
-### Option 1: Download Release
+### Option 1: Homebrew
+
+```bash
+brew tap bartbriek/hotdock
+brew install --cask hotdock
+```
+
+### Option 2: Download Release
 
 Download the latest `Hotdock-X.X.X.dmg` from [Releases](https://github.com/bartbriek/hotdock/releases), open it, and drag Hotdock to Applications.
 
@@ -26,7 +33,7 @@ xattr -cr /Applications/Hotdock.app
 Or right-click the app → "Open" → Click "Open" in the dialog.
 
 
-### Option 2: Build from Source
+### Option 3: Build from Source
 
 ```bash
 git clone https://github.com/bartbriek/hotdock.git
