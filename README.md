@@ -15,6 +15,14 @@ A lightweight macOS menu bar utility that lets you switch between dock applicati
 
 Download the latest `Hotdock-X.X.X.dmg` from [Releases](https://github.com/bartbriek/hotdock/releases), open it, and drag Hotdock to Applications.
 
+**Note:** Since the app is not code-signed, macOS may show a "damaged" warning. To fix this, run in Terminal:
+
+```bash
+xattr -cr /Applications/Hotdock.app
+```
+
+Or right-click the app → "Open" → Click "Open" in the dialog.
+
 ### Option 2: Homebrew (coming soon)
 
 ```bash
