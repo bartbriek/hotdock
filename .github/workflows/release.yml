@@ -52,6 +52,21 @@ jobs:
           echo "sha256=$SHA256" >> $GITHUB_OUTPUT
           echo "SHA256: $SHA256"
 
+      - name: Release
+        if: steps.version.outputs.should_release == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+
+      - name: Upload DMG to Release
+        if: steps.version.outputs.should_release == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          files: .build/Hotdock-${{ steps.version.outputs.version }}.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Update Homebrew Cask
         if: steps.version.outputs.should_release == 'true'
         run: |
@@ -86,19 +101,4 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Casks/hotdock.rb
           git commit -m "chore: update Homebrew cask to v${{ steps.version.outputs.version }}" || echo "No changes to commit"
-          git push
-
-      - name: Release
-        if: steps.version.outputs.should_release == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
-
-      - name: Upload DMG to Release
-        if: steps.version.outputs.should_release == 'true'
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ steps.version.outputs.version }}
-          files: .build/Hotdock-${{ steps.version.outputs.version }}.dmg
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git push || echo "::warning::Cask push rejected (branch protection). Update Casks/hotdock.rb manually."
