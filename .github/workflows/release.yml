@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   release:
@@ -94,11 +95,27 @@ jobs:
           end
           EOF
 
-      - name: Commit Cask update
+      - name: Open Cask update PR
         if: steps.version.outputs.should_release == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          VERSION=${{ steps.version.outputs.version }}
+          BRANCH="chore/cask-v$VERSION"
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
           git add Casks/hotdock.rb
-          git commit -m "chore: update Homebrew cask to v${{ steps.version.outputs.version }}" || echo "No changes to commit"
-          git push || echo "::warning::Cask push rejected (branch protection). Update Casks/hotdock.rb manually."
+
+          if ! git commit -m "chore: update Homebrew cask to v$VERSION"; then
+            echo "Cask already up to date"
+            exit 0
+          fi
+
+          # The ruleset protects main only, so a branch push needs no bypass. Merging the
+          # PR with squash produces a GitHub-signed commit, satisfying the signing rule.
+          git push origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: update Homebrew cask to v$VERSION" \
+            --body "Automated Homebrew cask bump for v$VERSION. Squash-merge to keep the signature rule satisfied."
