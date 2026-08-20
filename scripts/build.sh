@@ -42,6 +42,17 @@ cp "$PROJECT_DIR/Resources/AppIcon.icns" "$RESOURCES_DIR/"
 # Create PkgInfo
 echo -n "APPL????" > "$CONTENTS_DIR/PkgInfo"
 
+# Sign with a stable local identity when one exists. Ad-hoc signatures change on every
+# build, which makes macOS treat each build as a new app and drop its Accessibility grant.
+# CI has no such identity, so this is skipped there and release builds are unchanged.
+IDENTITY="Hotdock Dev"
+# No -v here: a self-signed identity reports as untrusted and would be filtered out,
+# even though codesign signs with it perfectly well.
+if security find-identity -p codesigning | grep -q "$IDENTITY"; then
+    echo "Signing with $IDENTITY..."
+    codesign --force --deep -s "$IDENTITY" "$APP_DIR"
+fi
+
 # Create DMG
 echo "Creating DMG..."
 rm -rf "$DMG_DIR"

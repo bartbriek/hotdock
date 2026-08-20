@@ -10,9 +10,18 @@ if ! command -v trufflehog &> /dev/null; then
     exit 1
 fi
 
-# Run trufflehog on the repository
-# --only-verified only reports verified secrets (reduces false positives)
-# --fail exits with non-zero if secrets are found
-trufflehog filesystem . --only-verified --fail
+# Scan only the staged files. Scanning the whole working tree also walks .build/,
+# which is hundreds of megabytes of build output and makes every commit crawl.
+STAGED=$(git diff --cached --name-only --diff-filter=ACM)
+
+if [ -z "$STAGED" ]; then
+    echo "No staged files to scan."
+    exit 0
+fi
+
+# --only-verified reduces false positives, --fail blocks the commit on a hit,
+# --no-update skips trufflehog's network version check on every commit
+echo "$STAGED" | tr '\n' '\0' | xargs -0 trufflehog filesystem \
+    --only-verified --fail --no-update
 
 echo "No secrets found."

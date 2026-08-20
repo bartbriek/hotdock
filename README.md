@@ -8,6 +8,7 @@ A lightweight macOS menu bar utility that lets you switch between dock applicati
 
 - **Keyboard shortcuts**: Press `Ctrl + number` to toggle dock apps by position
 - **Multi-digit support**: For docks with more than 9 items, press `Ctrl + 1 + 3` (within 400ms) to toggle position 13
+- **Window picker**: Hold the number to list that app's open windows (separate windows, not tabs) and pick one
 - **Visual badges**: Hold `Ctrl` to see position numbers overlaid on dock icons
 - **Full dock support**: Works with apps, folders, and files in your dock
 
@@ -51,6 +52,17 @@ open .build/Hotdock-1.0.0.dmg
    - If running and active: hides the app
    - If running but inactive: brings to front
    - If not running: launches the app
+
+### Picking a window
+
+Hold the number down instead of tapping it. After 400ms a panel lists that app's open windows, numbered top to bottom:
+
+- `Up` / `Down` moves the selection
+- Pressing a number jumps straight to that row
+- `Enter` switches to the selected window
+- `Esc` closes the panel and changes nothing
+
+You can let go of `Ctrl` and the number as soon as the panel appears; it stays open until you confirm or cancel. Minimized windows are listed and get restored if you pick one. Apps with only one window are just brought forward, with no panel.
 
 ### Multi-digit shortcuts
 

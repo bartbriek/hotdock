@@ -61,7 +61,10 @@ public final class DockAccessibility {
             return []
         }
 
-        let screenHeight = NSScreen.main?.frame.height ?? DockConstants.defaultScreenHeight
+        // AX reports global coordinates from the top-left of the primary display, so the
+        // flip must use that screen. NSScreen.main follows keyboard focus and returns a
+        // different height once another display has focus, which drags badges off the dock.
+        let screenHeight = NSScreen.screens.first?.frame.height ?? DockConstants.defaultScreenHeight
         let runningApps = NSWorkspace.shared.runningApplications
 
         var items: [DockItemInfo] = []

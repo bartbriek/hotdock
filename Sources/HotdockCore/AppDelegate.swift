@@ -12,6 +12,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var windowController = WindowController()
     private lazy var hotKeyManager = HotKeyManager()
     private lazy var dockOverlay = DockOverlay()
+    private lazy var windowPicker = WindowPicker()
 
     // MARK: - Lifecycle
 
@@ -29,6 +30,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     public func applicationWillTerminate(_ notification: Notification) {
         hotKeyManager.stop()
         dockOverlay.stop()
+        windowPicker.close()
     }
 
     // MARK: - Setup
@@ -36,6 +38,14 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     private func setupHotKeyCallbacks() {
         hotKeyManager.onHotKey = { [weak self] position in
             self?.handleHotKey(position: position)
+        }
+
+        hotKeyManager.onLongPress = { [weak self] position in
+            self?.handleLongPress(position: position)
+        }
+
+        hotKeyManager.onPickerKey = { [weak self] key in
+            self?.handlePickerKey(key)
         }
 
         hotKeyManager.onControlChanged = { [weak self] isPressed in
@@ -65,6 +75,10 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         infoItem.isEnabled = false
         menu.addItem(infoItem)
 
+        let cycleItem = NSMenuItem(title: "Hold the number to pick a window", action: nil, keyEquivalent: "")
+        cycleItem.isEnabled = false
+        menu.addItem(cycleItem)
+
         menu.addItem(NSMenuItem.separator())
 
         for item in dockManager.items.prefix(DockConstants.maxShortcuts) {
@@ -92,6 +106,43 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         windowController.toggleItem(item)
+    }
+
+    private func handleLongPress(position: Int) {
+        guard let item = dockManager.item(at: position) else {
+            return
+        }
+
+        guard item.isApp, let app = item.runningApplication else {
+            windowController.toggleItem(item)
+            return
+        }
+
+        let windows = AppWindows.list(for: app)
+        guard windows.count > 1 else {
+            app.activate(options: [.activateIgnoringOtherApps])
+            return
+        }
+
+        windowPicker.show(app: app, windows: windows)
+        hotKeyManager.isPickerOpen = true
+    }
+
+    private func handlePickerKey(_ key: PickerKey) {
+        switch key {
+        case .up:
+            windowPicker.moveSelection(by: -1)
+        case .down:
+            windowPicker.moveSelection(by: 1)
+        case .digit(let number):
+            windowPicker.select(index: number - 1)
+        case .confirm:
+            windowPicker.commit()
+            hotKeyManager.isPickerOpen = false
+        case .cancel:
+            windowPicker.close()
+            hotKeyManager.isPickerOpen = false
+        }
     }
 
     @objc private func refreshDock() {
