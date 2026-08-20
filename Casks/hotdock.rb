@@ -1,6 +1,6 @@
 cask "hotdock" do
-  version "1.1.0"
-  sha256 "1a8916e1c58cb3b1b2c65193fd04e84d36c2f07c3725804b0b4f7e662c68b287"
+  version "1.2.0"
+  sha256 "88f247669e5410985e7fc0579f8ae9053e98b0b41c075363139cbc32994a1570"
 
   url "https://github.com/bartbriek/hotdock/releases/download/v#{version}/Hotdock-#{version}.dmg"
   name "Hotdock"
